@@ -90,7 +90,7 @@ namespace SSAS.NET
         {
             stratisId = null;
 
-            var callback = value.StartsWith(SchemeWithDelimeter) ? value.Substring(SchemeWithDelimeter.Length) : value;
+            var callback = value.StartsWith(SchemeWithDelimeter) ? value[SchemeWithDelimeter.Length..] : value;
             if (callback.StartsWith("//")) return false;
 
             var callbackParts = callback.Split('?');
@@ -107,7 +107,7 @@ namespace SSAS.NET
                 var equalSignIndex = part.IndexOf('=');
                 if (equalSignIndex == -1) continue;
 
-                queryParams.Add(part.Substring(0, equalSignIndex), part.Substring(equalSignIndex + 1));
+                queryParams.Add(part[..equalSignIndex], part[(equalSignIndex + 1)..]);
             }
 
             if (!queryParams.ContainsKey(UidKey) || string.IsNullOrWhiteSpace(queryParams[UidKey])) return false;
