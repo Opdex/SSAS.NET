@@ -2,7 +2,7 @@ using FluentAssertions;
 using System;
 using Xunit;
 
-namespace SOAP.NET.Tests;
+namespace SSAS.NET.Tests;
 
 public class StratisIdTests
 {

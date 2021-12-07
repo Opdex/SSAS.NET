@@ -1,3 +1,3 @@
-# SOAP.NET
+# SSAS.NET
 
-.NET components that can be used for the implementation of [SOAP](https://github.com/Opdex/SOAP).
+.NET components that can be used for the implementation of [SSAS](https://github.com/Opdex/SSAS).

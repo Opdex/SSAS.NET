@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\SOAP.NET\SOAP.NET.csproj" />
+    <ProjectReference Include="..\..\src\SSAS.NET\SSAS.NET.csproj" />
   </ItemGroup>
 
 </Project>

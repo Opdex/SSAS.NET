@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SOAP.NET
+namespace SSAS.NET
 {
     /// <summary>
     /// A Stratis ID URI defined in Stratis Open Auth Protocol.

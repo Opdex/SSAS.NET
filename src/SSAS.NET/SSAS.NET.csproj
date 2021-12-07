@@ -1,16 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <PackageId>SOAP.NET</PackageId>
+    <PackageId>SSAS.NET</PackageId>
     <PackageVersion>1.0.0-beta.1</PackageVersion>
     <Author>Opdex</Author>
     <Company>Opdex</Company>
-    <Title>Strax Open Auth Protocol</Title>
-    <Description>Components used for the implement of Strax Open Auth Protocol.</Description>
+    <Title>Stratis Signature Authentication</Title>
+    <Description>Components used for the implement of Stratis Signature Authentication Specification.</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>Stratis;Strax;Cirrus</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/Opdex/SOAP.NET</RepositoryUrl>
+    <RepositoryUrl>https://github.com/Opdex/SSAS.NET</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryBranch>main</RepositoryBranch>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -23,7 +23,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="../../README.md" Pack="true" PackagePath="\"/>
+    <None Include="../../README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,6 +31,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
   </ItemGroup>
 
 </Project>
