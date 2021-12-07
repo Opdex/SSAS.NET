@@ -6,7 +6,7 @@
     <Author>Opdex</Author>
     <Company>Opdex</Company>
     <Title>Stratis Signature Authentication</Title>
-    <Description>Components used for the implement of Stratis Signature Authentication Specification.</Description>
+    <Description>Components used for the implementation of Stratis Signature Authentication Specification.</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>Stratis;Strax;Cirrus</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
