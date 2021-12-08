@@ -6,10 +6,11 @@
     <Author>Opdex</Author>
     <Company>Opdex</Company>
     <Title>Stratis Signature Authentication</Title>
-    <Description>Components used for the implementation of Stratis Signature Authentication Specification.</Description>
+    <Description>Components used for the implementation of Stratis Signature Auth Specification.</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>Stratis;Strax;Cirrus</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/Opdex/SSAS</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Opdex/SSAS.NET</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryBranch>main</RepositoryBranch>
