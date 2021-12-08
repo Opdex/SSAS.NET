@@ -15,6 +15,22 @@ public class StratisIdTests
     }
 
     [Fact]
+    public void Callback_WithScheme_TrimScheme()
+    {
+        var stratisId = new StratisId("https://api.opdex.com/auth", "123456789");
+
+        stratisId.Callback.Should().Be("api.opdex.com/auth?uid=123456789");
+    }
+
+    [Fact]
+    public void Callback_WithAuthorityIndicator_TrimAuthorityIndicator()
+    {
+        var stratisId = new StratisId("//api.opdex.com/auth", "123456789");
+
+        stratisId.Callback.Should().Be("api.opdex.com/auth?uid=123456789");
+    }
+
+    [Fact]
     public void Callback_WithoutExp_Combine()
     {
         var stratisId = new StratisId("api.opdex.com/auth", "123456789");
