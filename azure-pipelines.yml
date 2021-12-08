@@ -39,15 +39,14 @@ steps:
     projects: test/**/*.Tests.csproj
     arguments: '--configuration $(BUILD_CONFIGURATION) --no-build'
   displayName: 'Unit Test'
-
-- task: NuGetCommand@2
+  
+- task: DotNetCoreCLI@2
   inputs:
     command: 'pack'
     packagesToPack: 'src/**/*.csproj'
-    packDestination: '$(Build.ArtifactStagingDirectory)'
+    arguments: '--configuration $(BUILD_CONFIGURATION) --no-build --include-symbols'
     versioningScheme: 'off'
-    includeReferencedProjects: true
-    includeSymbols: true
+    packDirectory: '$(Build.ArtifactStagingDirectory)'
 
 - task: PublishPipelineArtifact@1
   inputs:
