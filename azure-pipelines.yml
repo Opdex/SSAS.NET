@@ -10,9 +10,8 @@ pool:
   vmImage: 'ubuntu-20.04'
 
 variables:
-  solution: '**/*.sln'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
+  SOLUTION: '**/*.sln'
+  BUILD_CONFIGURATION: 'Release'
 
 steps:
 - task: UseDotNet@2
