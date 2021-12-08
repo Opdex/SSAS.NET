@@ -23,7 +23,7 @@ namespace SSAS.NET
         /// <summary>
         /// Constructs a Stratis ID URI from its parts.
         /// </summary>
-        /// <param name="callbackPath">The combined domain and path of the callback URL.</param>
+        /// <param name="callbackPath">The combined authority and path of the callback URL.</param>
         /// <param name="uid">The unique identifier for a request.</param>
         /// <param name="exp">A unix timestamp that specifies when the signature should expire.</param>
         public StratisId(string callbackPath, string uid, long? exp = null)
@@ -32,6 +32,10 @@ namespace SSAS.NET
             if (uid is null) throw new ArgumentNullException(nameof(callbackPath));
 
             Uid = uid;
+
+            // parse callback path correctly if scheme or authority indicator is present
+            if (callbackPath.StartsWith("https://")) callbackPath = callbackPath[8..];
+            else callbackPath = callbackPath.TrimStart('/');
 
             var callbackBuilder = new StringBuilder();
             callbackBuilder.Append(callbackPath).Append('?').Append(UidKey).Append('=').Append(uid);
