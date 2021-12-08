@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>SSAS.NET</PackageId>
-    <PackageVersion>1.0.0-beta.4</PackageVersion>
+    <PackageVersion>1.0.0-beta.5</PackageVersion>
     <Author>Opdex</Author>
     <Company>Opdex</Company>
     <Title>Stratis Signature Authentication</Title>
@@ -30,9 +30,15 @@
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Include="../../README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
+  
 
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
