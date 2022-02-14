@@ -5,7 +5,7 @@ using System.Text;
 namespace SSAS.NET
 {
     /// <summary>
-    /// A Stratis ID URI defined in Stratis Open Auth Protocol.
+    /// A Stratis ID URI defined in Stratis Signature Auth Specification.
     /// </summary>
     public class StratisId : IEquatable<StratisId>
     {
@@ -17,8 +17,6 @@ namespace SSAS.NET
         private const string UidKey = "uid";
         private const string ExpKey = "exp";
         private const string SchemeWithDelimeter = "sid:";
-
-        private readonly DateTime _expiry = DateTime.MaxValue;
 
         /// <summary>
         /// Constructs a Stratis ID URI from its parts.
@@ -42,7 +40,7 @@ namespace SSAS.NET
 
             if (exp.HasValue)
             {
-                _expiry = DateTimeOffset.FromUnixTimeSeconds(exp.Value).UtcDateTime;
+                Expiry = DateTimeOffset.FromUnixTimeSeconds(exp.Value).UtcDateTime;
                 callbackBuilder.Append('&').Append(ExpKey).Append('=').Append(exp.Value.ToString());
             }
 
@@ -60,9 +58,14 @@ namespace SSAS.NET
         public string Uid { get; }
 
         /// <summary>
+        /// UTC expiry time for the Stratis Id.
+        /// </summary>
+        public DateTime Expiry { get; } = DateTime.MaxValue;
+
+        /// <summary>
         /// Returns true if the Stratis ID URI is expired relative to the current UTC time; otherwise false.
         /// </summary>
-        public bool Expired => DateTime.UtcNow > _expiry;
+        public bool Expired => DateTime.UtcNow > Expiry;
 
         /// <summary>
         /// Converts the <see cref="StratisId" /> to its <see cref="string" /> URI representation, including the scheme.

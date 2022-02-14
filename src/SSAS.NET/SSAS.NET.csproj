@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>SSAS.NET</PackageId>
-    <PackageVersion>1.0.0-beta.5</PackageVersion>
+    <PackageVersion>1.0.0-beta.6</PackageVersion>
     <Author>Opdex</Author>
     <Company>Opdex</Company>
     <Title>Stratis Signature Authentication</Title>
