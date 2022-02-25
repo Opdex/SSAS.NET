@@ -7,11 +7,27 @@ namespace SSAS.NET.Tests;
 public class StratisIdTests
 {
     [Fact]
-    public void ToString_SchemeAndCallback_Combine()
+    public void ToString_Callback_Return()
     {
         var stratisId = new StratisId("api.opdex.com/auth", "123456789", 1635200000);
 
-        stratisId.ToString().Should().Be("sid:api.opdex.com/auth?uid=123456789&exp=1635200000");
+        stratisId.ToString().Should().Be("api.opdex.com/auth?uid=123456789&exp=1635200000");
+    }
+
+    [Fact]
+    public void ToUriString_Callback_ReturnWithScheme()
+    {
+        var stratisId = new StratisId("api.opdex.com/auth", "123456789", 1635200000);
+
+        stratisId.ToUriString().Should().Be("sid:api.opdex.com/auth?uid=123456789&exp=1635200000");
+    }
+
+    [Fact]
+    public void ToProtocolString_Callback_ReturnWithScheme()
+    {
+        var stratisId = new StratisId("api.opdex.com/auth", "123456789", 1635200000);
+
+        stratisId.ToProtocolString().Should().Be("web+sid://api.opdex.com/auth?uid=123456789&exp=1635200000");
     }
 
     [Fact]
@@ -115,6 +131,28 @@ public class StratisIdTests
     }
 
     [Fact]
+    public void EqualOperator_Null_Handle()
+    {
+        StratisId? a = null;
+        StratisId? b = null;
+        StratisId c = new ("api.opdex.com/auth", "123456789");
+
+        (a == b).Should().Be(true);
+        (a != b).Should().Be(false);
+        (a == c).Should().Be(false);
+        (a != c).Should().Be(true);
+    }
+
+    [Fact]
+    public void TryParse_WithProtocol_True()
+    {
+        var canParse = StratisId.TryParse("web+sid://api.opdex.com/auth?uid=123456789&exp=1637240507", out var stratisId);
+
+        canParse.Should().Be(true);
+        stratisId.Should().Be(new StratisId("api.opdex.com/auth", "123456789", 1637240507));
+    }
+
+    [Fact]
     public void TryParse_WithScheme_True()
     {
         var canParse = StratisId.TryParse("sid:api.opdex.com/auth?uid=123456789&exp=1637240507", out var stratisId);
@@ -124,7 +162,7 @@ public class StratisIdTests
     }
 
     [Fact]
-    public void TryParse_WithoutScheme_True()
+    public void TryParse_NotAsUri_True()
     {
         var canParse = StratisId.TryParse("api.opdex.com/auth?uid=123456789&exp=1637240507", out var stratisId);
 

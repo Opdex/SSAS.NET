@@ -16,7 +16,9 @@ namespace SSAS.NET
 
         private const string UidKey = "uid";
         private const string ExpKey = "exp";
+
         private const string SchemeWithDelimeter = "sid:";
+        private const string ProtocolHandlerSchemeWithDelimeter = "web+sid://";
 
         /// <summary>
         /// Constructs a Stratis ID URI from its parts.
@@ -27,13 +29,11 @@ namespace SSAS.NET
         public StratisId(string callbackPath, string uid, long? exp = null)
         {
             if (callbackPath is null) throw new ArgumentNullException(nameof(callbackPath));
-            if (uid is null) throw new ArgumentNullException(nameof(callbackPath));
 
-            Uid = uid;
+            Uid = uid ?? throw new ArgumentNullException(nameof(uid));
 
             // parse callback path correctly if scheme or authority indicator is present
-            if (callbackPath.StartsWith("https://")) callbackPath = callbackPath[8..];
-            else callbackPath = callbackPath.TrimStart('/');
+            callbackPath = callbackPath.StartsWith("https://") ? callbackPath[8..] : callbackPath.TrimStart('/');
 
             var callbackBuilder = new StringBuilder();
             callbackBuilder.Append(callbackPath).Append('?').Append(UidKey).Append('=').Append(uid);
@@ -68,24 +68,42 @@ namespace SSAS.NET
         public bool Expired => DateTime.UtcNow > Expiry;
 
         /// <summary>
+        /// Converts the <see cref="StratisId" /> to its <see cref="string" /> representation.
+        /// </summary>
+        public override string ToString() => Callback;
+
+        /// <summary>
         /// Converts the <see cref="StratisId" /> to its <see cref="string" /> URI representation, including the scheme.
         /// </summary>
-        public override string ToString() => $"{SchemeWithDelimeter}{Callback}";
+        public string ToUriString()
+        {
+            return $"{SchemeWithDelimeter}{Callback}";
+        }
+
+        /// <summary>
+        /// Converts the <see cref="StratisId" /> to its <see cref="string" /> protocol handler URI representation.
+        /// </summary>
+        public string ToProtocolString()
+        {
+            return $"{ProtocolHandlerSchemeWithDelimeter}{Callback}";
+        }
 
         /// <inheritdoc />
         public override int GetHashCode() => Callback.GetHashCode();
 
         /// <inheritdoc />
-        public bool Equals(StratisId other) => Callback.Equals(other.Callback, StringComparison.InvariantCultureIgnoreCase);
+        public bool Equals(StratisId other) => other is { } && Callback.Equals(other.Callback, StringComparison.InvariantCultureIgnoreCase);
 
         /// <inheritdoc />
         public override bool Equals(object obj) => obj is StratisId other && Equals(other);
 
-        /// <inheritdoc />
-        public static bool operator ==(StratisId a, StratisId b) => a.Equals(b);
+        public static bool operator ==(StratisId a, StratisId b)
+        {
+            if (a is null) return b is null;
+            return a.Equals(b);
+        }
 
-        /// <inheritdoc />
-        public static bool operator !=(StratisId a, StratisId b) => !a.Equals(b);
+        public static bool operator !=(StratisId a, StratisId b) => !(a == b);
 
         /// <summary>
         /// Converts the string representation of a Stratis ID URI or callback to its <see cref="StratisId" /> equivalent. A return value indicates whether the operation succeeded.
@@ -97,14 +115,17 @@ namespace SSAS.NET
         {
             stratisId = null;
 
-            var callback = value.StartsWith(SchemeWithDelimeter) ? value[SchemeWithDelimeter.Length..] : value;
+            var callback = value.StartsWith(SchemeWithDelimeter)
+                ? value[SchemeWithDelimeter.Length..]
+                : value.StartsWith(ProtocolHandlerSchemeWithDelimeter)
+                    ? value[ProtocolHandlerSchemeWithDelimeter.Length..]
+                    : value;
             if (callback.StartsWith("//")) return false;
 
-            var callbackParts = callback.Split('?');
+            var callbackParts = callback.Split('?', StringSplitOptions.RemoveEmptyEntries);
             if (callbackParts.Length != 2) return false;
 
             var queryString = callbackParts[1];
-            if (queryString is null) return false;
 
             var queryParams = new Dictionary<string, string>();
 
