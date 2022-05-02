@@ -48,6 +48,16 @@ namespace SSAS.NET
         }
 
         /// <summary>
+        /// Constructs a Stratis ID URI from its parts.
+        /// </summary>
+        /// <param name="callbackPath">The combined authority and path of the callback URL.</param>
+        /// <param name="uid">The unique identifier for a request.</param>
+        /// <param name="exp">A timestamp that specifies when the signature should expire.</param>
+        public StratisId(string callbackPath, string uid, DateTimeOffset exp) : this(callbackPath, uid, exp.ToUnixTimeSeconds())
+        {
+        }
+
+        /// <summary>
         /// Protocol-relative callback URL to which the signer sends a HTTPS request.
         /// </summary>
         public string Callback { get; }

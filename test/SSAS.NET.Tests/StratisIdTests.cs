@@ -55,10 +55,20 @@ public class StratisIdTests
     }
 
     [Fact]
-    public void Expiry_Constructor_Set()
+    public void Expiry_ConstructorUnixTime_Set()
     {
         var expiry = DateTimeOffset.UtcNow.AddSeconds(-1);
         var stratisId = new StratisId("api.opdex.com/auth", "123456789", expiry.ToUnixTimeSeconds());
+
+        var expiryWithSecondPrecision = new DateTime(expiry.Year, expiry.Month, expiry.Day, expiry.Hour, expiry.Minute, expiry.Second);
+        stratisId.Expiry.Should().Be(expiryWithSecondPrecision);
+    }
+
+    [Fact]
+    public void Expiry_ConstructorDateTimeOffset_Set()
+    {
+        var expiry = DateTimeOffset.UtcNow.AddSeconds(-1);
+        var stratisId = new StratisId("api.opdex.com/auth", "123456789", expiry);
 
         var expiryWithSecondPrecision = new DateTime(expiry.Year, expiry.Month, expiry.Day, expiry.Hour, expiry.Minute, expiry.Second);
         stratisId.Expiry.Should().Be(expiryWithSecondPrecision);
