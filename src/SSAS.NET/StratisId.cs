@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -45,6 +45,16 @@ namespace SSAS.NET
             }
 
             Callback = callbackBuilder.ToString();
+        }
+
+        /// <summary>
+        /// Constructs a Stratis ID URI from its parts.
+        /// </summary>
+        /// <param name="callbackPath">The combined authority and path of the callback URL.</param>
+        /// <param name="uid">The unique identifier for a request.</param>
+        /// <param name="exp">A timestamp that specifies when the signature should expire.</param>
+        public StratisId(string callbackPath, string uid, DateTimeOffset exp) : this(callbackPath, uid, exp.ToUnixTimeSeconds())
+        {
         }
 
         /// <summary>
