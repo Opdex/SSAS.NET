@@ -27,7 +27,7 @@ public class StratisIdTests
     {
         var stratisId = new StratisId("api.opdex.com/auth", "123456789", 1635200000);
 
-        stratisId.ToProtocolString().Should().Be("web+sid://api.opdex.com/auth?uid=123456789&exp=1635200000");
+        stratisId.ToProtocolString().Should().Be("web+sid:api.opdex.com/auth?uid=123456789&exp=1635200000");
     }
 
     [Fact]
@@ -156,7 +156,7 @@ public class StratisIdTests
     [Fact]
     public void TryParse_WithProtocol_True()
     {
-        var canParse = StratisId.TryParse("web+sid://api.opdex.com/auth?uid=123456789&exp=1637240507", out var stratisId);
+        var canParse = StratisId.TryParse("web+sid:api.opdex.com/auth?uid=123456789&exp=1637240507", out var stratisId);
 
         canParse.Should().Be(true);
         stratisId.Should().Be(new StratisId("api.opdex.com/auth", "123456789", 1637240507));
@@ -181,9 +181,27 @@ public class StratisIdTests
     }
 
     [Fact]
-    public void TryParse_WithAnchor_False()
+    public void TryParse_WithProtocolAndDoubleSlash_True()
+    {
+        var canParse = StratisId.TryParse("web+sid://api.opdex.com/auth?uid=123456789&exp=1637240507", out var stratisId);
+
+        canParse.Should().Be(true);
+        stratisId.Should().Be(new StratisId("api.opdex.com/auth", "123456789", 1637240507));
+    }
+
+    [Fact]
+    public void TryParse_WithUriAndDoubleSlash_True()
     {
         var canParse = StratisId.TryParse("sid://api.opdex.com/auth?uid=123456789&exp=1637240507", out var stratisId);
+
+        canParse.Should().Be(true);
+        stratisId.Should().Be(new StratisId("api.opdex.com/auth", "123456789", 1637240507));
+    }
+
+    [Fact]
+    public void TryParse_WithAnchor_False()
+    {
+        var canParse = StratisId.TryParse("sid:api.opdex.com/auth?uid=123456789&exp=1637240507#anchor", out var stratisId);
 
         canParse.Should().Be(false);
         stratisId.Should().Be(null);

@@ -14,11 +14,16 @@ namespace SSAS.NET
         /// </summary>
         public const string Scheme = "sid";
 
+        /// <summary>
+        /// Protocol handler compatible Stratis ID URI scheme.
+        /// </summary>
+        public const string ProtocolScheme = "web+sid";
+
         private const string UidKey = "uid";
         private const string ExpKey = "exp";
 
         private const string SchemeWithDelimeter = "sid:";
-        private const string ProtocolHandlerSchemeWithDelimeter = "web+sid://";
+        private const string ProtocolHandlerSchemeWithDelimeter = "web+sid:";
 
         /// <summary>
         /// Constructs a Stratis ID URI from its parts.
@@ -130,7 +135,7 @@ namespace SSAS.NET
                 : value.StartsWith(ProtocolHandlerSchemeWithDelimeter)
                     ? value[ProtocolHandlerSchemeWithDelimeter.Length..]
                     : value;
-            if (callback.StartsWith("//")) return false;
+            if (callback.StartsWith("//")) callback = callback[2..];
 
             var callbackParts = callback.Split('?', StringSplitOptions.RemoveEmptyEntries);
             if (callbackParts.Length != 2) return false;
