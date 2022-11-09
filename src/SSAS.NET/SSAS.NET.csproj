@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>SSAS.NET</PackageId>
-    <PackageVersion>1.0.0-beta.8</PackageVersion>
+    <PackageVersion>1.0.0-beta.9</PackageVersion>
     <Author>Opdex</Author>
     <Company>Opdex</Company>
     <Title>Stratis Signature Authentication</Title>
@@ -21,7 +21,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;net5.0;net6.0;net7.0</TargetFrameworks>
     <IsPackable>true</IsPackable>
     <OutputType>Library</OutputType>
   </PropertyGroup>
