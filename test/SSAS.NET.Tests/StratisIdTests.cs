@@ -55,6 +55,14 @@ public class StratisIdTests
     }
 
     [Fact]
+    public void Callback_Null_ThrowArgumentNullException()
+    {
+        this.Invoking(_ => new StratisId(null, "123456789"))
+            .Should()
+            .ThrowExactly<ArgumentNullException>().Where(e => e.ParamName == "callbackPath");
+    }
+
+    [Fact]
     public void Callback_WithScheme_TrimScheme()
     {
         var stratisId = new StratisId("https://api.opdex.com/auth", "123456789");
@@ -122,13 +130,14 @@ public class StratisIdTests
         stratisId.Expiry.Should().Be(expiryWithSecondPrecision);
     }
 
-    [Fact]
-    public void RedirectScheme_Constructor_Set()
+    [Theory]
+    [InlineData("googlechromes")]
+    [InlineData("://example.com/redirect")]
+    public void RedirectUri_Invalid_ThrowArgumentException(string redirectUri)
     {
-        var stratisId = new StratisId("api.opdex.com/auth", "123456789", null, "googlechromes://");
-
-        stratisId.RedirectScheme.Should().Be("googlechromes");
-        stratisId.RedirectUri.Should().Be(null);
+        this.Invoking(_ => new StratisId("api.opdex.com/auth", "123456789", null, redirectUri))
+            .Should()
+            .ThrowExactly<ArgumentException>().Where(e => e.ParamName == "redirectUri");
     }
 
     [Fact]
@@ -136,8 +145,7 @@ public class StratisIdTests
     {
         var stratisId = new StratisId("api.opdex.com/auth", "123456789", null, "googlechromes://redirect.com/path");
 
-        stratisId.RedirectScheme.Should().Be("googlechromes");
-        stratisId.RedirectUri.Should().Be("redirect.com/path");
+        stratisId.RedirectUri.Should().Be("googlechromes://redirect.com/path");
     }
 
     [Fact]

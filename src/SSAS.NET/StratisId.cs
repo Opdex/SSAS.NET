@@ -48,34 +48,12 @@ namespace SSAS.NET
         /// <param name="exp">A unix timestamp that specifies when the signature should expire.</param>
         /// <param name="redirectUri">The full URI to redirect the user on completion of the mobile flow.</param>
         public StratisId(string callbackPath, string uid, long? exp = null, string redirectUri = null)
-            : this(callbackPath, uid, exp, ParseUriScheme(redirectUri), ParseUriAfterScheme(redirectUri))
-        {
-        }
-
-        private static string ParseUriScheme(string redirectUri)
-        {
-            if (redirectUri is null) return null;
-            var parts = redirectUri.Split(':');
-            if (parts.Length != 2) throw new ArgumentException("Redirect URI must be a valid URI", nameof(redirectUri));
-            if (string.IsNullOrWhiteSpace(parts[0])) throw new ArgumentException("Redirect URI must contain a valid scheme", nameof(redirectUri));
-            return parts[0];
-        }
-
-        private static string ParseUriAfterScheme(string redirectUri)
-        {
-            if (redirectUri is null) return null;
-            var parts = redirectUri.Split(':');
-            return parts[1] == "" || parts[1] == "//"
-                ? null
-                : parts[1].StartsWith("//")
-                    ? parts[1][2..]
-                    : parts[1];
-        }
-
-        private StratisId(string callbackPath, string uid, long? exp = null,
-                          string redirectScheme = null, string redirectUri = null)
         {
             if (callbackPath is null) throw new ArgumentNullException(nameof(callbackPath));
+            if (redirectUri != null && !ValidateRedirectUri(redirectUri))
+            {
+                throw new ArgumentException("Redirect URI is not valid", nameof(redirectUri));
+            }
 
             Uid = uid ?? throw new ArgumentNullException(nameof(uid));
             
@@ -93,7 +71,6 @@ namespace SSAS.NET
 
             Callback = callbackBuilder.ToString();
 
-            RedirectScheme = redirectScheme;
             RedirectUri = redirectUri;
         }
 
@@ -118,14 +95,20 @@ namespace SSAS.NET
         public bool Expired => DateTime.UtcNow > Expiry;
 
         /// <summary>
-        /// URI scheme used to perform a redirect, on completion of SSAS mobile flow.
-        /// </summary>
-        public string RedirectScheme { get; }
-
-        /// <summary>
-        /// Schemeless URI used in redirect, on completion of SSAS mobile flow.
+        /// URI used to perform a redirect, on completion of SSAS mobile flow.
         /// </summary>
         public string RedirectUri { get; }
+
+        private string BuildRedirectSchemeArgument() => RedirectUri?.Split(':')[0];
+
+        private string BuildRedirectUriArgument()
+        {
+            if (RedirectUri is null) return null;
+            var unserializedRedirectUriArgument = RedirectUri.Split(':')[1][2..];
+            return unserializedRedirectUriArgument == ""
+                ? null
+                : WebUtility.UrlEncode(unserializedRedirectUriArgument);
+        }
 
         /// <summary>
         /// Converts the <see cref="StratisId" /> to its <see cref="string" /> representation.
@@ -144,8 +127,12 @@ namespace SSAS.NET
         {
             var protocolUriBuilder = new StringBuilder();
             protocolUriBuilder.Append(ProtocolHandlerSchemeWithDelimeter).Append(Callback);
-            if (RedirectScheme != null) protocolUriBuilder.Append('&').Append(RedirectSchemeKey).Append('=').Append(RedirectScheme);
-            if (RedirectUri != null) protocolUriBuilder.Append('&').Append(RedirectUriKey).Append('=').Append(WebUtility.UrlEncode(RedirectUri));
+            
+            var redirectSchemeArgument = BuildRedirectSchemeArgument();
+            if (redirectSchemeArgument != null)protocolUriBuilder.Append('&').Append(RedirectSchemeKey).Append('=').Append(redirectSchemeArgument);
+            
+            var redirectUriArgument = BuildRedirectUriArgument();
+            if (redirectUriArgument != null) protocolUriBuilder.Append('&').Append(RedirectUriKey).Append('=').Append(redirectUriArgument);
             
             return protocolUriBuilder.ToString();
         }
@@ -153,18 +140,15 @@ namespace SSAS.NET
         /// <inheritdoc />
         public override int GetHashCode()
         {
-            return RedirectScheme is null
-                ? Callback.GetHashCode()
-                : RedirectUri is null
-                    ? HashCode.Combine(Callback.GetHashCode(), RedirectScheme.GetHashCode())
-                    : HashCode.Combine(Callback.GetHashCode(), RedirectScheme.GetHashCode(), RedirectUri.GetHashCode());
+            return RedirectUri is null
+                    ? HashCode.Combine(Callback.GetHashCode())
+                    : HashCode.Combine(Callback.GetHashCode(), RedirectUri.GetHashCode());
         }
 
         /// <inheritdoc />
         public bool Equals(StratisId other) =>
             other is { }
             && Callback.Equals(other.Callback, StringComparison.InvariantCultureIgnoreCase)
-            && ((RedirectScheme is null && other.RedirectScheme is null) || (RedirectScheme != null && RedirectScheme.Equals(other.RedirectScheme, StringComparison.InvariantCultureIgnoreCase)))
             && ((RedirectUri is null && other.RedirectUri is null) || (RedirectUri != null && RedirectUri.Equals(other.RedirectUri, StringComparison.InvariantCultureIgnoreCase)));
 
         /// <inheritdoc />
@@ -220,19 +204,32 @@ namespace SSAS.NET
                 exp = expiry;
             }
 
-            var redirectScheme = queryParams.ContainsKey(RedirectSchemeKey)
+            var redirectSchemeArgument = queryParams.ContainsKey(RedirectSchemeKey)
                 ? queryParams[RedirectSchemeKey]
                 : null;
-            var redirectUri = queryParams.ContainsKey(RedirectUriKey) 
+            var redirectUriArgument = queryParams.ContainsKey(RedirectUriKey) 
                 ? WebUtility.UrlDecode(queryParams[RedirectUriKey])
                 : null;
             
             // validate redirect scheme and uri
-            if ((redirectScheme is null && redirectUri != null) || redirectScheme == "") return false;
+            if ((redirectSchemeArgument is null && redirectUriArgument != null) || redirectSchemeArgument == "") return false;
 
-            stratisId = new StratisId(callbackParts[0], queryParams[UidKey], exp, redirectScheme, redirectUri);
+            stratisId = new StratisId(callbackParts[0], queryParams[UidKey], exp, BuildRedirectUri(redirectSchemeArgument, redirectUriArgument));
 
             return true;
+        }
+
+        private static string BuildRedirectUri(string redirectScheme, string redirectUri)
+        {
+            if (redirectScheme is null) return null;
+            var schemeWithAuthority = redirectScheme + "://";
+            return redirectUri is null ? schemeWithAuthority : schemeWithAuthority + redirectUri;
+        }
+
+        private static bool ValidateRedirectUri(string redirectUri)
+        {
+            var uriParts = redirectUri.Split(':');
+            return uriParts.Length == 2 && uriParts[0] != "";
         }
     }
 }
